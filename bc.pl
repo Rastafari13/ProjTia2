@@ -1,20 +1,19 @@
-%Made_by_JoséRibeiro
-
 :- dynamic comprimento/2 .
-:- dynamic ocupacao/2 .
-:- dynamic passageiroKM/2 .
+:- dynamic preco/2 .
+:- dynamic despesaKM/2 .
 :-[bd].
 
-%OcupacaoCaminho
-ocupacaoAutocarro([],0).
-ocupacaoAutocarro([X|R],Soma) :- passageiros(X,TotalEstacao),
-ocupacaoAutocarro(R,TotalAutocarro), Soma is TotalEstacao + TotalAutocarro.
+%PrecoCaminho
+precoCaminho([],0).
+precoCaminho([X|R],Soma) :- custo(X,TotalLocal),
+precoCaminho(R,TotalCaminho), Soma is TotalLocal + TotalCaminho.
 
-guardarOcupacaoAutocarro(Caminho):- ocupacaoAutocarro(Caminho, Valor),
-assertz(ocupacao(Caminho, Valor)).
+guardarPrecoCaminho(Caminho):- precoCaminho(Caminho, Valor),
+assertz(preco(Caminho, Valor)).
 
-gerarOcupacoesCaminhos([]).
-gerarOcupacoesCaminhos([C1|R1]):- guardarOcupacaoAutocarro(C1), gerarOcupacoesCaminhos(R1).
+gerarPrecosCaminhos([]).
+gerarPrecosCaminhos([C1|R1]):- guardarPrecoCaminho(C1), gerarPrecosCaminhos(R1).
+
 
 %DistanciaCaminho
 calcularDistancia(_,[],0).
@@ -29,27 +28,25 @@ gerarDistanciasCaminhos([C1|R1]):- guardarDistancia(C1), gerarDistanciasCaminhos
 
 distanciaCaminho([P1|R1], Valor):-  calcularDistancia(P1,R1,Valor).
 
-%PassageirosKM
-calcularPassageirosKM(Caminho):- guardarDistancia(Caminho), guardarOcupacaoAutocarro(Caminho),
-ocupacao(Caminho, OcupacaoCaminho), comprimento(Caminho, DistanciaCaminho),
-assertz(passageiroKM(Caminho, OcupacaoCaminho / DistanciaCaminho)).
+%DespesasKM
+calcularDespesasKM(Caminho):- guardarDistancia(Caminho), guardarPrecoCaminho(Caminho),
+preco(Caminho, DespesaCaminho), comprimento(Caminho, DistanciaCaminho),
+assertz(despesaKM(Caminho, DespesaCaminho / DistanciaCaminho)).
 
-gerarPassageirosKM([]).
-gerarPassageirosKM([C1|R1]):- calcularPassageirosKM(C1), gerarPassageirosKM(R1).
+gerarDespesasKM([]).
+gerarDespesasKM([C1|R1]):- calcularDespesasKM(C1), gerarDespesasKM(R1).
 
-passageiroKMCaminho(Caminho, Indice):- guardarDistancia(Caminho), guardarOcupacaoAutocarro(Caminho),
-ocupacao(Caminho, OcupacaoCaminho), comprimento(Caminho, DistanciaCaminho), Indice is OcupacaoCaminho / DistanciaCaminho.
+passageiroKMCaminho(Caminho, Indice):- guardarDistancia(Caminho), guardarPrecoCaminho(Caminho),
+ocupacao(Caminho, DespesaCaminho), comprimento(Caminho, DistanciaCaminho), Indice is DespesaCaminho / DistanciaCaminho.
 
 %CaminhosDisponiveis
 caminho(X,Z,Caminho):- caminho(X,Z,[X],Caminho).
-caminho(X,X,Caminho,Caminho):- ocupacaoAutocarro(Caminho,Soma), Soma =< 45.
+caminho(X,X,Caminho,Caminho):- precoCaminho(Caminho,Soma), Soma =< 450.
 caminho(X,Z,Visitado,Caminho):- percurso(X,Y,_), \+ member(Y,Visitado),
 caminho(Y,Z,[Y | Visitado],Caminho).
 
 %GerarListaCaminhos
 listaCaminhos(X,Y,Lista):- findall(C,caminho(X,Y,C),Lista).
-
-%QuestõesDoUtilizador
 
 %CaminhoMaisCurto
 caminhoMaisCurto(X,Y,Caminho):- retractall(comprimento(_,_)), listaCaminhos(X,Y,Lista),
@@ -64,21 +61,20 @@ gerarDistanciasCaminhos(Lista), maisLongo(Caminho).
 
 maisLongo(Caminho):- comprimento(Caminho, V), \+ (comprimento(_, V1), V1 > V).
 
+%CaminhoMenosDespesa
+caminhoMenosDespesa(X,Y,Caminho):- retractall(preco(_,_)), listaCaminhos(X,Y,Lista),
+gerarPrecosCaminhos(Lista), menosDespesa(Caminho).
 
-%CaminhoMenosPassageiros
-caminhoMenosPassageiros(X,Y,Caminho):- retractall(ocupacao(_,_)), listaCaminhos(X,Y,Lista),
-gerarOcupacoesCaminhos(Lista), menosPassageiros(Caminho).
+menosDespesa(Caminho):- preco(Caminho, V), \+ (preco(_, V1), V > V1).
 
-menosPassageiros(Caminho):- ocupacao(Caminho, V), \+ (ocupacao(_, V1), V > V1).
+%CaminhoMaisDespesa
+caminhoMaisDespesa(X,Y,Caminho):- retractall(preco(_,_)), listaCaminhos(X,Y,Lista),
+gerarPrecosCaminhos(Lista), maisDespesa(Caminho).
 
-%CaminhoMaisPassageiros
-caminhoMaisPassageiros(X,Y,Caminho):- retractall(ocupacao(_,_)), listaCaminhos(X,Y,Lista),
-gerarOcupacoesCaminhos(Lista), maisPassageiros(Caminho).
-
-maisPassageiros(Caminho):- ocupacao(Caminho, V), \+ (ocupacao(_, V1), V1 > V).
+maisDespesa(Caminho):- preco(Caminho, V), \+ (preco(_, V1), V1 > V).
 
 %CaminhoMaisVantajoso
-caminhoMaisVantajoso(X,Y,Caminho):- retractall(passageiroKM(_,_)), listaCaminhos(X,Y,Lista),
-gerarPassageirosKM(Lista),!, maisVantajoso(Caminho).
+caminhoMaisVantajoso(X,Y,Caminho):- retractall(despesaKM(_,_)), listaCaminhos(X,Y,Lista),
+gerarDespesasKM(Lista),!, maisVantajoso(Caminho).
 
-maisVantajoso(Caminho):- passageiroKM(Caminho, V), \+ (passageiroKM(_, V1), V1 > V).
+maisVantajoso(Caminho):- despesaKM(Caminho, V), \+ (despesaKM(_, V1), V1 > V).
