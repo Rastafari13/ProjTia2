@@ -60,28 +60,20 @@ questao3(A,B,C):- nl,nl,nl,write('Percursos Possiveis com partida na opcao '), w
 %listar1([X|Y]) :- write(X), write(' ') , listar1(Y).
 %listar1(_).
 
-resposta1(A,B,C):- listaCaminhos(A,B,C), questao4(A,B,C).
+resposta1(A,B,C):- caminhoMaisCurto(A,B,C), questao4(A,B,C).
 
 
-questao4(A,B,C) :- ((1==C),nl, nl, write('O percurso com menor custo partindo da opcao '), write(A), write(' e com destino na opcao '), write(B), nl, nl, resposta2(A,B);
-				    (2==C),nl, nl, write('O percurso com menor distancia partindo da opcao '), write(A), write(' e com destino na opcao '), write(B), nl, nl, resposta3(A,B)
+questao4(A,B,C) :- ((1==C),nl, nl, write('O percurso com menor custo partindo da opcao '), write(A), write(' e com destino na opcao '), write(B), nl, nl, resposta2(A,B,C);
+				    (2==C),nl, nl, write('O percurso com menor distancia partindo da opcao '), write(A), write(' e com destino na opcao '), write(B), nl, nl, resposta3(A,B,C)
 ).
 
 
-resposta2(A,B) :- caminhoMenosDespesa(A,B,C),write(C),nl, finalizar().
+resposta2(A,B,C) :- caminhoMenosDespesa(A,B,C),write(C),nl, finalizar().
 
-resposta3(A,B) :- caminhoMaisCurto(A,B,C),write(C),nl, finalizar().
-
-
-finalizar():- nl, nl,write("_____________________________________________________________________
-_____________________________________________________________________
+resposta3(A,B,C) :- caminhoMaisCurto(A,B,C),write(C),nl, finalizar().
 
 
-                           BOA VIAGEM
-                      Introduzir 0. para sair.
-             Introduzir 1. para criar um novo percurso.
+finalizar():- nl, nl,write('Obrigada pela preferencia!'),nl,nl,
+                     write('Esperamos por si em breve.').
 
-_____________________________________________________________________
-_____________________________________________________________________"), nl,
-            read(Z),((Z == 0), halt;
-                     (Z == 1), questao0).
+
