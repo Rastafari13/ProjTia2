@@ -77,4 +77,4 @@ maisDespesa(Caminho):- preco(Caminho, V), \+ (preco(_, V1), V1 > V).
 caminhoMaisVantajoso(X,Y,Caminho):- retractall(despesaKM(_,_)), listaCaminhos(X,Y,Lista),
 gerarDespesasKM(Lista),!, maisVantajoso(Caminho).
 
-maisVantajoso(Caminho):- despesaKM(Caminho, V), \+ (despesaKM(_, V1), V1 > V).
+maisVantajoso(Caminho):- despesaKM(Caminho, V), \+ (despesaKM(_, V1), V1 < V).

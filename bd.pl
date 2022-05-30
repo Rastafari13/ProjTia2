@@ -21,7 +21,7 @@ percurso('l4','l2',20).
 percurso('l5','l2',25).
 percurso('l6','l2',30).
 percurso('l7','l6',15).
-percurso('l7','l2',20).
+percurso('l7','l2',25).
 percurso('l8','l7',25).
 percurso('l8','l3',30).
 
@@ -35,7 +35,7 @@ percurso('l2','l4',20).
 percurso('l2','l5',25).
 percurso('l2','l6',30).
 percurso('l6','l7',15).
-percurso('l2','l7',20).
+percurso('l2','l7',25).
 percurso('l7','l8',25).
 percurso('l3','l8',30).
 
